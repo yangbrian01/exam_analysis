@@ -14,6 +14,7 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     html { scroll-behavior: smooth; }
     ::-webkit-scrollbar { width: 6px; }
@@ -86,24 +87,68 @@
     </div>
   </div>
 
+  <!-- 登入與註冊整合區塊 (已重構) -->
   <div id="loginModal" class="fixed inset-0 bg-slate-900 bg-opacity-50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity">
     <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform" id="loginBox">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-        <h3 class="font-bold text-lg text-slate-800">登入 Yang Tech</h3>
+        <h3 class="font-bold text-lg text-slate-800" id="authModalTitle">登入 Yang Tech</h3>
         <button onclick="toggleLoginModal()" class="text-slate-400 hover:text-red-500 text-xl"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div class="p-8 space-y-5">
+      
+      <!-- 登入表單 -->
+      <div id="loginFormArea" class="p-8 space-y-5">
         <div>
-          <label class="block text-xs font-bold text-slate-500 mb-1.5">帳號 (自訂)</label>
-          <input type="text" id="username" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 font-medium" placeholder="例如: yang123">
+          <label class="block text-xs font-bold text-slate-500 mb-1.5">帳號 (Username)</label>
+          <input type="text" id="login_username" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 font-medium" placeholder="例如: yang123">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-500 mb-1.5">密碼</label>
-          <input type="password" id="password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 font-medium" placeholder="請輸入密碼">
+          <label class="block text-xs font-bold text-slate-500 mb-1.5">密碼 (Password)</label>
+          <input type="password" id="login_password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 font-medium" placeholder="請輸入密碼">
         </div>
-        <button onclick="login()" id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition-colors mt-4">
-          安全登入 / 註冊
+        <button onclick="executeLogin()" id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition-colors mt-4">
+          安全登入
         </button>
+        <div class="flex justify-between text-sm mt-4 px-1">
+          <button onclick="switchAuthView('register')" class="text-slate-500 hover:text-blue-600 font-medium transition-colors">建立新帳號</button>
+          <button onclick="switchAuthView('forgot')" class="text-slate-500 hover:text-blue-600 font-medium transition-colors">忘記密碼？</button>
+        </div>
+      </div>
+
+      <!-- 註冊表單 -->
+      <div id="registerFormArea" class="p-8 space-y-5 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1.5">帳號 (Username)</label>
+          <input type="text" id="reg_username" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-slate-800 font-medium" placeholder="自訂帳號">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1.5">密碼 (Password)</label>
+          <input type="password" id="reg_password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-slate-800 font-medium" placeholder="設定密碼">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1.5">電子郵件 (忘記密碼時用)</label>
+          <input type="email" id="reg_email" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-slate-800 font-medium" placeholder="例如: your@email.com">
+        </div>
+        <button onclick="executeRegister()" id="regBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-md transition-colors mt-4">
+          立即註冊
+        </button>
+        <div class="text-center text-sm mt-4">
+          <button onclick="switchAuthView('login')" class="text-slate-500 hover:text-emerald-600 font-medium transition-colors">已有帳號？返回登入</button>
+        </div>
+      </div>
+
+      <!-- 忘記密碼表單 -->
+      <div id="forgotFormArea" class="p-8 space-y-5 hidden">
+        <p class="text-sm text-slate-600 mb-2">請輸入您的帳號，系統將會產生一組隨機密碼並寄送至您註冊時綁定的電子信箱。</p>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1.5">帳號 (Username)</label>
+          <input type="text" id="forgot_username" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-slate-800 font-medium" placeholder="請輸入帳號">
+        </div>
+        <button onclick="executeForgotPassword()" id="forgotBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-lg shadow-md transition-colors mt-4">
+          重置密碼並寄送信件
+        </button>
+        <div class="text-center text-sm mt-4">
+          <button onclick="switchAuthView('login')" class="text-slate-500 hover:text-amber-600 font-medium transition-colors">想起密碼了？返回登入</button>
+        </div>
       </div>
     </div>
   </div>
@@ -544,6 +589,136 @@
       if (popRes) popularityData = popRes;
     });
 
+    // ==========================================
+    // 🔐 帳號與安全視圖切換與執行 (更新)
+    // ==========================================
+    function switchAuthView(view) {
+      document.getElementById('loginFormArea').classList.add('hidden');
+      document.getElementById('registerFormArea').classList.add('hidden');
+      document.getElementById('forgotFormArea').classList.add('hidden');
+      
+      if(view === 'login') {
+        document.getElementById('loginFormArea').classList.remove('hidden');
+        document.getElementById('authModalTitle').innerText = '登入 Yang Tech';
+      } else if(view === 'register') {
+        document.getElementById('registerFormArea').classList.remove('hidden');
+        document.getElementById('authModalTitle').innerText = '註冊新帳號';
+      } else if(view === 'forgot') {
+        document.getElementById('forgotFormArea').classList.remove('hidden');
+        document.getElementById('authModalTitle').innerText = '忘記密碼';
+      }
+    }
+
+    function toggleLoginModal() {
+      var m = document.getElementById('loginModal');
+      var box = document.getElementById('loginBox');
+      if(m.classList.contains('hidden')) {
+        switchAuthView('login');
+        m.classList.remove('hidden');
+        setTimeout(()=> box.classList.remove('scale-95'), 10);
+      } else {
+        box.classList.add('scale-95');
+        setTimeout(()=> m.classList.add('hidden'), 200);
+      }
+    }
+
+    async function executeLogin() {
+      var u = document.getElementById('login_username').value;
+      var p = document.getElementById('login_password').value;
+      if(!u || !p) { Swal.fire("提示", "請輸入帳號與密碼", "warning"); return; }
+      
+      var btn = document.getElementById('loginBtn');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> 驗證中...';
+      btn.disabled = true;
+
+      const res = await callAPI('loginUser', { username: u, password: p });
+      
+      btn.innerHTML = '安全登入';
+      btn.disabled = false;
+      
+      if(res && res.success) {
+        currentUser = u;
+        toggleLoginModal();
+        document.getElementById('navLoginBtn').classList.add('hidden');
+        document.getElementById('navUserStatus').classList.remove('hidden');
+        document.getElementById('navUsername').innerText = u;
+        
+        var savedScores = JSON.parse(res.scores || "{}");
+        ['國文','英文','數A','數B','社會','自然','英聽','主修','視唱','數甲','數乙','物理','化學','生物','歷史','地理','公民'].forEach(sub => {
+          if(savedScores[sub] !== undefined && document.getElementById(sub)) document.getElementById(sub).value = savedScores[sub];
+        });
+        
+        try { myWishlist = res.wishlist ? JSON.parse(res.wishlist) : []; } catch(e) { myWishlist = []; }
+        myWishlist = myWishlist.map(w => w.channel ? w : {...w, channel: 'gsat'});
+        
+        const popRes = await callAPI('getWishlistStats', { excludeUsername: currentUser });
+        if (popRes) {
+           popularityData = popRes;
+           updateWishlistUI();
+           Swal.fire({toast: true, position: 'top-end', icon: 'success', title: '登入成功', showConfirmButton: false, timer: 1500});
+        }
+        
+        if (res.lastAiResponse && res.lastAiResponse !== "") {
+           var formattedText = res.lastAiResponse.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, '<span class="font-bold text-indigo-800">$1</span>');
+           document.getElementById('aiStrategyContent').innerHTML = '<strong><i class="fa-solid fa-robot mr-1"></i> 上次 AI 導師建議：</strong><div class="mt-2 text-slate-700">' + formattedText + '</div>';
+           document.getElementById('toggleAiHistoryBtn').classList.remove('hidden'); 
+           document.getElementById('aiStrategyResult').classList.add('hidden'); 
+        }
+      } else if (res) {
+        Swal.fire("登入失敗", res.message, "error");
+      }
+    }
+
+    async function executeRegister() {
+      var u = document.getElementById('reg_username').value;
+      var p = document.getElementById('reg_password').value;
+      var e = document.getElementById('reg_email').value;
+      
+      if(!u || !p || !e) { Swal.fire("提示", "請填寫完整註冊資訊", "warning"); return; }
+      if(u.length < 3 || p.length < 4) { Swal.fire("提示", "帳號至少3碼，密碼至少4碼", "warning"); return; }
+      if(!e.includes('@')) { Swal.fire("提示", "請輸入有效的電子信箱", "warning"); return; }
+      
+      var btn = document.getElementById('regBtn');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> 註冊中...';
+      btn.disabled = true;
+
+      const res = await callAPI('registerUser', { username: u, password: p, email: e });
+      
+      btn.innerHTML = '立即註冊';
+      btn.disabled = false;
+      
+      if(res && res.success) {
+        Swal.fire("註冊成功", res.message, "success");
+        document.getElementById('login_username').value = u;
+        switchAuthView('login');
+      } else if (res) {
+        Swal.fire("註冊失敗", res.message, "error");
+      }
+    }
+
+    async function executeForgotPassword() {
+      var u = document.getElementById('forgot_username').value;
+      if(!u) { Swal.fire("提示", "請輸入您的帳號", "warning"); return; }
+      
+      var btn = document.getElementById('forgotBtn');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> 處理中...';
+      btn.disabled = true;
+
+      const res = await callAPI('forgotPassword', { username: u });
+      
+      btn.innerHTML = '重置密碼並寄送信件';
+      btn.disabled = false;
+      
+      if(res && res.success) {
+        Swal.fire("寄送成功", res.message, "success");
+        switchAuthView('login');
+      } else if (res) {
+        Swal.fire("處理失敗", res.message, "error");
+      }
+    }
+
+    // ==========================================
+
     function toggleAiResult() {
       var box = document.getElementById('aiStrategyResult');
       var btn = document.getElementById('toggleAiHistoryBtn');
@@ -744,18 +919,6 @@
       setTimeout(()=> t.classList.add('opacity-0', 'pointer-events-none'), 3000);
     }
 
-    function toggleLoginModal() {
-      var m = document.getElementById('loginModal');
-      var box = document.getElementById('loginBox');
-      if(m.classList.contains('hidden')) {
-        m.classList.remove('hidden');
-        setTimeout(()=> box.classList.remove('scale-95'), 10);
-      } else {
-        box.classList.add('scale-95');
-        setTimeout(()=> m.classList.add('hidden'), 200);
-      }
-    }
-
     function toggleWishlist() {
       var d = document.getElementById('wishlistDrawer');
       var o = document.getElementById('drawerOverlay');
@@ -789,55 +952,6 @@
       } else {
         detailsDiv.classList.add('hidden');
         chevronIcon.classList.remove('rotate-180');
-      }
-    }
-
-    async function login() {
-      var u = document.getElementById('username').value;
-      var p = document.getElementById('password').value;
-      if(!u || !p) { showToast("請輸入帳號與密碼"); return; }
-      
-      var btn = document.getElementById('loginBtn');
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> 驗證中...';
-      btn.disabled = true;
-
-      const res = await callAPI('loginUser', { username: u, password: p });
-      
-      btn.innerHTML = '安全登入 / 註冊';
-      btn.disabled = false;
-      
-      if(res && res.status.indexOf("✅") !== -1) {
-        currentUser = u;
-        toggleLoginModal();
-        document.getElementById('navLoginBtn').classList.add('hidden');
-        document.getElementById('navUserStatus').classList.remove('hidden');
-        document.getElementById('navUsername').innerText = u;
-        
-        var savedScores = JSON.parse(res.scores || "{}");
-        ['國文','英文','數A','數B','社會','自然','英聽','主修','視唱','數甲','數乙','物理','化學','生物','歷史','地理','公民'].forEach(sub => {
-          if(savedScores[sub] !== undefined && document.getElementById(sub)) document.getElementById(sub).value = savedScores[sub];
-        });
-        
-        try { myWishlist = res.wishlist ? JSON.parse(res.wishlist) : []; } catch(e) { myWishlist = []; }
-        myWishlist = myWishlist.map(w => w.channel ? w : {...w, channel: 'gsat'});
-        
-        const popRes = await callAPI('getWishlistStats', { excludeUsername: currentUser });
-        if (popRes) {
-           popularityData = popRes;
-           updateWishlistUI();
-           showToast("登入成功");
-        }
-        
-        if (res.lastAiResponse && res.lastAiResponse !== "") {
-           var formattedText = res.lastAiResponse.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, '<span class="font-bold text-indigo-800">$1</span>');
-           document.getElementById('aiStrategyContent').innerHTML = '<strong><i class="fa-solid fa-robot mr-1"></i> 上次 AI 導師建議：</strong><div class="mt-2 text-slate-700">' + formattedText + '</div>';
-           document.getElementById('toggleAiHistoryBtn').classList.remove('hidden'); 
-           document.getElementById('aiStrategyResult').classList.add('hidden'); 
-        }
-      } else if (res) {
-        showToast("建立新帳號中...");
-        const regRes = await callAPI('registerUser', { username: u, password: p });
-        if(regRes && regRes.indexOf("✅") !== -1) login(); 
       }
     }
 
@@ -1080,7 +1194,7 @@
     function toggleStar(event, code, school, dept, level, quota, reqs, date, encodedLogs) {
       event.stopPropagation();
       if(!currentUser) {
-        showToast("💡 需登入帳號才能收藏唷！");
+        Swal.fire("提示", "需登入帳號才能收藏唷！", "info");
         toggleLoginModal();
         return;
       }
@@ -1142,24 +1256,24 @@
                   
                   if (w.level === "保守") {
                       bgClass = "bg-emerald-50 border-emerald-200"; textClass = "text-emerald-800 border-emerald-500";
-                      levelTag = `<span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">保</span>`;
+                      levelTag = \`<span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">保</span>\`;
                   } else if (w.level === "理想") {
                       bgClass = "bg-blue-50 border-blue-200"; textClass = "text-blue-800 border-blue-500";
-                      levelTag = `<span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">理</span>`;
+                      levelTag = \`<span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">理</span>\`;
                   } else if (w.level === "夢幻") {
                       bgClass = "bg-orange-50 border-orange-200"; textClass = "text-orange-800 border-orange-500";
-                      levelTag = `<span class="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">夢</span>`;
+                      levelTag = \`<span class="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">夢</span>\`;
                   } else if (w.level && w.level.indexOf("未知") !== -1) {
                       bgClass = "bg-slate-100 border-slate-300"; textClass = "text-slate-600 border-slate-400";
-                      levelTag = `<span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">?</span>`;
+                      levelTag = \`<span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">?</span>\`;
                   }
 
                   var detailsHtml = "";
                   var noteContent = w.note ? w.note : ""; 
                   
                   if (w.quota) {
-                    var logList = (w.logs || "").split(" ｜ ").filter(Boolean).map(d => `<li class="flex items-start mb-0.5 text-[11px]"><i class="fa-solid fa-check text-blue-500 mr-1.5 mt-1 text-[9px]"></i><span class="leading-tight text-slate-600">${d}</span></li>`).join('');
-                    var dateHtml = w.channel !== 'ast' && w.date ? `<div class="text-[11px] text-slate-500 mt-1"><i class="fa-regular fa-calendar-days text-blue-400 mr-1"></i>面試: ${w.date}</div>` : '';
+                    var logList = (w.logs || "").split(" ｜ ").filter(Boolean).map(d => \`<li class="flex items-start mb-0.5 text-[11px]"><i class="fa-solid fa-check text-blue-500 mr-1.5 mt-1 text-[9px]"></i><span class="leading-tight text-slate-600">\${d}</span></li>\`).join('');
+                    var dateHtml = w.channel !== 'ast' && w.date ? \`<div class="text-[11px] text-slate-500 mt-1"><i class="fa-regular fa-calendar-days text-blue-400 mr-1"></i>面試: \${w.date}</div>\` : '';
                     detailsHtml = `
                       <div id="wishlist-details-${w.code}" class="hidden mt-2 pt-2 border-t border-slate-200/60">
                         <div class="flex flex-wrap gap-x-3 gap-y-1 mb-1.5 text-[11px]">
@@ -1180,7 +1294,7 @@
                   }
 
                   var popCount = popularityData[w.code] || 0;
-                  var popHtml = popCount > 0 ? `<span class="text-[10px] text-red-500 font-bold ml-1.5 whitespace-nowrap"><i class="fa-solid fa-fire"></i> ${popCount}</span>` : "";
+                  var popHtml = popCount > 0 ? \`<span class="text-[10px] text-red-500 font-bold ml-1.5 whitespace-nowrap"><i class="fa-solid fa-fire"></i> \${popCount}</span>\` : "";
 
                   return `
                   <div class="border rounded-lg shadow-sm group hover:shadow-md transition-all overflow-hidden ${bgClass}">
@@ -1277,7 +1391,7 @@
 
     async function saveData() {
       if(!currentUser) {
-        showToast("請先登入才能儲存唷！");
+        Swal.fire("提示", "請先登入才能儲存唷！", "info");
         toggleLoginModal();
         return;
       }
@@ -1307,7 +1421,7 @@
       var contact = document.getElementById('fbContact').value.trim();
       
       if(!content) {
-        showToast("⚠️ 請填寫你想說的話喔！");
+        Swal.fire("提示", "請填寫你想說的話喔！", "warning");
         return;
       }
 
@@ -1322,7 +1436,7 @@
       if (res) {
         document.getElementById('fbContent').value = ''; 
         toggleFeedbackModal(); 
-        showToast(res);
+        Swal.fire("傳送成功", res, "success");
       }
     }
 
@@ -1338,7 +1452,7 @@
 
     function openRecommendModal() {
         if (lastAnalysisResults.length === 0) {
-            showToast("⚠️ 請先點擊「一鍵啟動智能分析」，有了數據才能為您推薦喔！");
+            Swal.fire("提示", "請先點擊「一鍵啟動智能分析」，有了數據才能為您推薦喔！", "info");
             return;
         }
         document.getElementById('recommendSetup').classList.remove('hidden');
@@ -1396,11 +1510,11 @@
         let groupRegex = groupRegexStr ? new RegExp(groupRegexStr) : null;
 
         if (selectedRegions.length === 0) {
-            showToast("⚠️ 請至少選擇一個地區！");
+            Swal.fire("提示", "請至少選擇一個地區！", "warning");
             return;
         }
         if (selectedGroups.length === 0) {
-            showToast("⚠️ 請至少選擇一個學群方向！");
+            Swal.fire("提示", "請至少選擇一個學群方向！", "warning");
             return;
         }
 
@@ -1507,13 +1621,13 @@
 
     async function callTrueAI() {
       if (!currentUser) {
-        showToast("💡 需登入帳號才能召喚專屬 AI 喔！");
+        Swal.fire("提示", "需登入帳號才能召喚專屬 AI 喔！", "info");
         toggleLoginModal();
         return;
       }
       
       if (myWishlist.length === 0) {
-        showToast("⚠️ 你的志願清單空空如也，AI 不知道你想考哪裡呀！");
+        Swal.fire("提示", "你的志願清單空空如也，AI 不知道你想考哪裡呀！", "warning");
         return;
       }
 
@@ -1540,14 +1654,13 @@
           
           document.getElementById('aiStrategyContent').innerHTML = '<strong><i class="fa-solid fa-robot mr-1"></i> AI 導師建議：</strong><div class="mt-2">' + formattedText + '</div>';
           document.getElementById('toggleAiHistoryBtn').classList.add('hidden');
-          showToast("✨ AI 分析完成！");
+          Swal.fire({toast: true, position: 'top-end', icon: 'success', title: 'AI 分析完成！', showConfirmButton: false, timer: 2000});
         } else {
           document.getElementById('aiStrategyContent').innerHTML = '<span class="text-red-600">' + res + '</span>';
           document.getElementById('toggleAiHistoryBtn').classList.add('hidden');
         }
       }
     }
-
   </script>
 </body>
 </html>
