@@ -87,7 +87,6 @@
     </div>
   </div>
 
-  <!-- 登入與註冊整合區塊 (已重構) -->
   <div id="loginModal" class="fixed inset-0 bg-slate-900 bg-opacity-50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity">
     <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform" id="loginBox">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -95,7 +94,6 @@
         <button onclick="toggleLoginModal()" class="text-slate-400 hover:text-red-500 text-xl"><i class="fa-solid fa-xmark"></i></button>
       </div>
       
-      <!-- 登入表單 -->
       <div id="loginFormArea" class="p-8 space-y-5">
         <div>
           <label class="block text-xs font-bold text-slate-500 mb-1.5">帳號 (Username)</label>
@@ -114,7 +112,6 @@
         </div>
       </div>
 
-      <!-- 註冊表單 -->
       <div id="registerFormArea" class="p-8 space-y-5 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-500 mb-1.5">帳號 (Username)</label>
@@ -136,7 +133,6 @@
         </div>
       </div>
 
-      <!-- 忘記密碼表單 -->
       <div id="forgotFormArea" class="p-8 space-y-5 hidden">
         <p class="text-sm text-slate-600 mb-2">請輸入您的帳號，系統將會產生一組隨機密碼並寄送至您註冊時綁定的電子信箱。</p>
         <div>
@@ -1256,24 +1252,24 @@
                   
                   if (w.level === "保守") {
                       bgClass = "bg-emerald-50 border-emerald-200"; textClass = "text-emerald-800 border-emerald-500";
-                      levelTag = \`<span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">保</span>\`;
+                      levelTag = <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">保</span>;
                   } else if (w.level === "理想") {
                       bgClass = "bg-blue-50 border-blue-200"; textClass = "text-blue-800 border-blue-500";
-                      levelTag = \`<span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">理</span>\`;
+                      levelTag = <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">理</span>;
                   } else if (w.level === "夢幻") {
                       bgClass = "bg-orange-50 border-orange-200"; textClass = "text-orange-800 border-orange-500";
-                      levelTag = \`<span class="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">夢</span>\`;
+                      levelTag = <span class="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">夢</span>;
                   } else if (w.level && w.level.indexOf("未知") !== -1) {
                       bgClass = "bg-slate-100 border-slate-300"; textClass = "text-slate-600 border-slate-400";
-                      levelTag = \`<span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">?</span>\`;
+                      levelTag = <span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">?</span>;
                   }
 
                   var detailsHtml = "";
                   var noteContent = w.note ? w.note : ""; 
                   
                   if (w.quota) {
-                    var logList = (w.logs || "").split(" ｜ ").filter(Boolean).map(d => \`<li class="flex items-start mb-0.5 text-[11px]"><i class="fa-solid fa-check text-blue-500 mr-1.5 mt-1 text-[9px]"></i><span class="leading-tight text-slate-600">\${d}</span></li>\`).join('');
-                    var dateHtml = w.channel !== 'ast' && w.date ? \`<div class="text-[11px] text-slate-500 mt-1"><i class="fa-regular fa-calendar-days text-blue-400 mr-1"></i>面試: \${w.date}</div>\` : '';
+                    var logList = (w.logs || "").split(" ｜ ").filter(Boolean).map(d => <li class="flex items-start mb-0.5 text-[11px]"><i class="fa-solid fa-check text-blue-500 mr-1.5 mt-1 text-[9px]"></i><span class="leading-tight text-slate-600">${d}</span></li>).join('');
+                    var dateHtml = w.channel !== 'ast' && w.date ? <div class="text-[11px] text-slate-500 mt-1"><i class="fa-regular fa-calendar-days text-blue-400 mr-1"></i>面試: ${w.date}</div> : '';
                     detailsHtml = `
                       <div id="wishlist-details-${w.code}" class="hidden mt-2 pt-2 border-t border-slate-200/60">
                         <div class="flex flex-wrap gap-x-3 gap-y-1 mb-1.5 text-[11px]">
@@ -1290,11 +1286,11 @@
                       </div>
                     `;
                   } else {
-                    detailsHtml = `<div id="wishlist-details-${w.code}" class="hidden mt-2 pt-2 border-t border-slate-200/60 text-xs text-slate-400 text-center py-2">💡 請點擊上方「更新燈號」載入分數與詳細資訊</div>`;
+                    detailsHtml = <div id="wishlist-details-${w.code}" class="hidden mt-2 pt-2 border-t border-slate-200/60 text-xs text-slate-400 text-center py-2">💡 請點擊上方「更新燈號」載入分數與詳細資訊</div>;
                   }
 
                   var popCount = popularityData[w.code] || 0;
-                  var popHtml = popCount > 0 ? \`<span class="text-[10px] text-red-500 font-bold ml-1.5 whitespace-nowrap"><i class="fa-solid fa-fire"></i> \${popCount}</span>\` : "";
+                  var popHtml = popCount > 0 ? <span class="text-[10px] text-red-500 font-bold ml-1.5 whitespace-nowrap"><i class="fa-solid fa-fire"></i> ${popCount}</span> : "";
 
                   return `
                   <div class="border rounded-lg shadow-sm group hover:shadow-md transition-all overflow-hidden ${bgClass}">
