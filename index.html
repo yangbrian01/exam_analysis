@@ -1239,82 +1239,82 @@
         var buildSection = (title, icon, list, categoryId) => {
           if(list.length === 0) return '';
           return `
-            <div class="mb-4 bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
-              <button onclick="toggleWishlistCategory('${categoryId}')" class="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 flex justify-between items-center transition-colors">
-                <h4 class="text-base font-bold text-slate-700 flex items-center"><i class="${icon} mr-2"></i>${title} <span class="ml-2 text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full">${list.length}</span></h4>
-                <i id="icon-${categoryId}" class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-200"></i>
-              </button>
-              <div id="content-${categoryId}" class="hidden p-3 space-y-3 bg-slate-50/50 border-t border-slate-100">
-                ${list.map(w => {
-                  var bgClass = "bg-white border-slate-200";
-                  var textClass = "text-slate-700 border-blue-500";
-                  var levelTag = "";
-                  
-                  if (w.level === "保守") {
-                      bgClass = "bg-emerald-50 border-emerald-200"; textClass = "text-emerald-800 border-emerald-500";
-                      levelTag = \`<span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">保</span>\`;
-                  } else if (w.level === "理想") {
-                      bgClass = "bg-blue-50 border-blue-200"; textClass = "text-blue-800 border-blue-500";
-                      levelTag = \`<span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">理</span>\`;
-                  } else if (w.level === "夢幻") {
-                      bgClass = "bg-orange-50 border-orange-200"; textClass = "text-orange-800 border-orange-500";
-                      levelTag = \`<span class="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">夢</span>\`;
-                  } else if (w.level && w.level.indexOf("未知") !== -1) {
-                      bgClass = "bg-slate-100 border-slate-300"; textClass = "text-slate-600 border-slate-400";
-                      levelTag = \`<span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">?</span>\`;
-                  }
+          <div class="mb-4 bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+            <button onclick="toggleWishlistCategory('${categoryId}')" class="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 flex justify-between items-center transition-colors">
+              <h4 class="text-base font-bold text-slate-700 flex items-center"><i class="${icon} mr-2"></i>${title} <span class="ml-2 text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full">${list.length}</span></h4>
+              <i id="icon-${categoryId}" class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-200"></i>
+            </button>
+            <div id="content-${categoryId}" class="hidden p-3 space-y-3 bg-slate-50/50 border-t border-slate-100">
+             ${list.map(w => {
+               var bgClass = "bg-white border-slate-200";
+               var textClass = "text-slate-700 border-blue-500";
+               var levelTag = "";
+          
+               if (w.level === "保守") {
+                   bgClass = "bg-emerald-50 border-emerald-200"; textClass = "text-emerald-800 border-emerald-500";
+                   levelTag = `<span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">保</span>`;
+               } else if (w.level === "理想") {
+                   bgClass = "bg-blue-50 border-blue-200"; textClass = "text-blue-800 border-blue-500";
+                   levelTag = `<span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">理</span>`;
+               } else if (w.level === "夢幻") {
+                   bgClass = "bg-orange-50 border-orange-200"; textClass = "text-orange-800 border-orange-500";
+                   levelTag = `<span class="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">夢</span>`;
+               } else if (w.level && w.level.indexOf("未知") !== -1) {
+                   bgClass = "bg-slate-100 border-slate-300"; textClass = "text-slate-600 border-slate-400";
+                   levelTag = `<span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-bold ml-1.5 shrink-0">?</span>`;
+               }
 
-                  var detailsHtml = "";
-                  var noteContent = w.note ? w.note : ""; 
-                  
-                  if (w.quota) {
-                    var logList = (w.logs || "").split(" ｜ ").filter(Boolean).map(d => \`<li class="flex items-start mb-0.5 text-[11px]"><i class="fa-solid fa-check text-blue-500 mr-1.5 mt-1 text-[9px]"></i><span class="leading-tight text-slate-600">\${d}</span></li>\`).join('');
-                    var dateHtml = w.channel !== 'ast' && w.date ? \`<div class="text-[11px] text-slate-500 mt-1"><i class="fa-regular fa-calendar-days text-blue-400 mr-1"></i>面試: \${w.date}</div>\` : '';
-                    detailsHtml = \`
-                      <div id="wishlist-details-\${w.code}" class="hidden mt-2 pt-2 border-t border-slate-200/60">
-                        <div class="flex flex-wrap gap-x-3 gap-y-1 mb-1.5 text-[11px]">
-                           <span class="text-slate-600 font-medium">名額: <b class="text-slate-800">\${w.quota}</b></span>
-                           <span class="text-slate-600 font-medium">檢定: <b class="text-blue-600">\${w.requirements || '無'}</b></span>
-                        </div>
-                        \${dateHtml}
-                        <ul class="list-none p-0 m-0 mt-1.5 mb-3">\${logList}</ul>
-                        
-                        <div class="bg-amber-50 rounded p-2 border border-amber-200/50 mt-2">
-                           <div class="text-[10px] font-bold text-amber-700 mb-1 flex items-center"><i class="fa-solid fa-pen-clip mr-1"></i>我的專屬備忘錄 (自動儲存)</div>
-                           <textarea onclick="event.stopPropagation()" onchange="updateWishlistNote('\${w.code}', '\${w.channel}', this)" rows="2" class="w-full bg-white border border-amber-200 rounded text-xs p-1.5 text-slate-700 outline-none focus:ring-1 focus:ring-amber-400 resize-none placeholder-amber-200" placeholder="例如：要準備英文自介、教授喜歡問...">\${noteContent}</textarea>
-                        </div>
-                      </div>
-                    \`;
-                  } else {
-                    detailsHtml = \`<div id="wishlist-details-\${w.code}" class="hidden mt-2 pt-2 border-t border-slate-200/60 text-xs text-slate-400 text-center py-2">💡 請點擊上方「更新燈號」載入分數與詳細資訊</div>\`;
-                  }
+               var detailsHtml = "";
+               var noteContent = w.note ? w.note : ""; 
+          
+               if (w.quota) {
+                 var logList = (w.logs || "").split(" ｜ ").filter(Boolean).map(d => `<li class="flex items-start mb-0.5 text-[11px]"><i class="fa-solid fa-check text-blue-500 mr-1.5 mt-1 text-[9px]"></i><span class="leading-tight text-slate-600">${d}</span></li>`).join('');
+                 var dateHtml = w.channel !== 'ast' && w.date ? `<div class="text-[11px] text-slate-500 mt-1"><i class="fa-regular fa-calendar-days text-blue-400 mr-1"></i>面試: ${w.date}</div>` : '';
+                 detailsHtml = `
+                   <div id="wishlist-details-${w.code}" class="hidden mt-2 pt-2 border-t border-slate-200/60">
+                     <div class="flex flex-wrap gap-x-3 gap-y-1 mb-1.5 text-[11px]">
+                        <span class="text-slate-600 font-medium">名額: <b class="text-slate-800">${w.quota}</b></span>
+                        <span class="text-slate-600 font-medium">檢定: <b class="text-blue-600">${w.requirements || '無'}</b></span>
+                     </div>
+                     ${dateHtml}
+                     <ul class="list-none p-0 m-0 mt-1.5 mb-3">${logList}</ul>
+                
+                     <div class="bg-amber-50 rounded p-2 border border-amber-200/50 mt-2">
+                        <div class="text-[10px] font-bold text-amber-700 mb-1 flex items-center"><i class="fa-solid fa-pen-clip mr-1"></i>我的專屬備忘錄 (自動儲存)</div>
+                        <textarea onclick="event.stopPropagation()" onchange="updateWishlistNote('${w.code}', '${w.channel}', this)" rows="2" class="w-full bg-white border border-amber-200 rounded text-xs p-1.5 text-slate-700 outline-none focus:ring-1 focus:ring-amber-400 resize-none placeholder-amber-200" placeholder="例如：要準備英文自介、教授喜歡問...">${noteContent}</textarea>
+                     </div>
+                   </div>
+                 `;
+               } else {
+                 detailsHtml = `<div id="wishlist-details-${w.code}" class="hidden mt-2 pt-2 border-t border-slate-200/60 text-xs text-slate-400 text-center py-2">💡 請點擊上方「更新燈號」載入分數與詳細資訊</div>`;
+               }
 
-                  var popCount = popularityData[w.code] || 0;
-                  var popHtml = popCount > 0 ? \`<span class="text-[10px] text-red-500 font-bold ml-1.5 whitespace-nowrap"><i class="fa-solid fa-fire"></i> \${popCount}</span>\` : "";
+               var popCount = popularityData[w.code] || 0;
+               var popHtml = popCount > 0 ? `<span class="text-[10px] text-red-500 font-bold ml-1.5 whitespace-nowrap"><i class="fa-solid fa-fire"></i> ${popCount}</span>` : "";
 
-                  return \`
-                  <div class="border rounded-lg shadow-sm group hover:shadow-md transition-all overflow-hidden \${bgClass}">
-                    <div class="p-3.5 flex items-center justify-between cursor-pointer" onclick="toggleWishlistDetails('\${w.code}')">
-                      <div class="flex items-center flex-wrap w-5/6 gap-y-1">
-                         <span class="text-sm font-bold truncate border-l-4 pl-2.5 text-left w-full sm:w-auto sm:max-w-[70%] \${textClass}">\${w.name}</span>
-                         <div class="flex items-center mt-0.5 sm:mt-0">
-                           \${levelTag}
-                           \${popHtml}
-                         </div>
+               return `
+               <div class="border rounded-lg shadow-sm group hover:shadow-md transition-all overflow-hidden ${bgClass}">
+                 <div class="p-3.5 flex items-center justify-between cursor-pointer" onclick="toggleWishlistDetails('${w.code}')">
+                   <div class="flex items-center flex-wrap w-5/6 gap-y-1">
+                      <span class="text-sm font-bold truncate border-l-4 pl-2.5 text-left w-full sm:w-auto sm:max-w-[70%] ${textClass}">${w.name}</span>
+                      <div class="flex items-center mt-0.5 sm:mt-0">
+                        ${levelTag}
+                        ${popHtml}
                       </div>
-                      <div class="flex items-center space-x-2 shrink-0">
-                        <i id="wishlist-chevron-\${w.code}" class="fa-solid fa-chevron-down text-[10px] text-slate-300 transition-transform"></i>
-                        <button class="text-slate-300 hover:text-red-500 transition-colors px-1 z-10" onclick="removeWishlistItem(event, '\${w.code}', '\${w.channel}')"><i class="fa-solid fa-trash-can text-sm"></i></button>
-                      </div>
-                    </div>
-                    <div class="px-3.5 pb-3 pt-0 bg-white/40">
-                      \${detailsHtml}
-                    </div>
-                  </div>\`;
-                }).join('')}
-              </div>
-            </div>\`;
-        };
+                   </div>
+                   <div class="flex items-center space-x-2 shrink-0">
+                     <i id="wishlist-chevron-${w.code}" class="fa-solid fa-chevron-down text-[10px] text-slate-300 transition-transform"></i>
+                     <button class="text-slate-300 hover:text-red-500 transition-colors px-1 z-10" onclick="removeWishlistItem(event, '${w.code}', '${w.channel}')"><i class="fa-solid fa-trash-can text-sm"></i></button>
+                   </div>
+                 </div>
+                 <div class="px-3.5 pb-3 pt-0 bg-white/40">
+                   ${detailsHtml}
+                 </div>
+               </div>`;
+             }).join('')}
+           </div>
+         </div>`;
+     };
 
         var html = "";
         html += buildSection("大學個人申請", "fa-solid fa-university text-blue-500", gsatList, "gsat");
